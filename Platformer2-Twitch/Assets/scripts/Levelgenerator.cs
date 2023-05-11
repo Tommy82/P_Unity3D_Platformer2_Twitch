@@ -33,6 +33,8 @@ public class Levelgenerator : MonoBehaviour
 
     [Tooltip("Anzahl der Platformen in diesem Level")]
     public int platformCount = 10;
+    [Tooltip("Prozentuale Anzahl an Platformen mit Abgrund"), Range(0, 1)]
+    public float platformAbysPercent = 0.5f;
 
     /// <summary>Liste aller generierten Platformen</summary>
     private List<Platform> lstPlatforms = new List<Platform>();
@@ -78,6 +80,44 @@ public class Levelgenerator : MonoBehaviour
         // Generiere neue "Zufallszahl"
         return myRandom.Next(min, max);
     }
+
+    /// <summary>
+    /// Laden einer Liste von Zufallszahlen
+    /// - Dabei werden alle möglichen Zahlen in einen Zwischenspeicher geladen und dann entsprechend per zufall ausgewählt. Ähnlich wie beim Lotto
+    /// - Hintergrund: Es muss sichergestellt werden, dass keine Zahl doppelt ist!
+    /// </summary>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    List<int> GetMyRandomNumbers(int min, int max, int count)
+    {
+        // Hinweis: max ist immer der Maximalwert, bei "Next" Funktion wird dieser Wert aber niemals erreicht! Daher setzen wir hier "max + 1"
+        max = max + 1;
+
+        List<int> response = new List<int>();
+        List<int> temp = new List<int>();
+
+        // Fülle Zwischenspeicher
+        for ( int i = min; i < max; i++)
+        {
+            temp.Add(i);
+        }
+
+        // Fülle Rückgabe
+        for ( int i = 0; i < count; i++ )
+        {
+            // Wähle eine Zahl aus dem Zwischenspeicher aus
+            // Hier muss Count-1 gerechnet werden, da sonst ein Fehler auftreten könnte! 
+            // Hintergrund: Array fängt bei "0" an und max Wert wird in "GetMyRandomNumer" einen hochgezählt!
+            int tmp = GetMyRandomNumber(0, temp.Count - 1);
+            // Füge Zahl dem Response hinzu
+            response.Add(temp[tmp]);
+            // Lösche Zahl aus Zwischenspeicher
+            temp.RemoveAt(tmp);
+        }
+        return response;
+    }
     #endregion Functions - Zufallszahlen
 
     #region Functions Platforms
@@ -107,6 +147,11 @@ public class Levelgenerator : MonoBehaviour
                     break;
             }
 
+            // Prüfen ob Minimale bzw. Maximale Höhe nicht überschritten wurde
+            currentHeight = Mathf.Max(currentHeight, platformHeightMin);
+            currentHeight = Mathf.Min(currentHeight, platformHeightMax);
+
+
             // Generieren einer Zufallslänge
             int currentLength = GetMyRandomNumber(platformLengthMin, platformLengthMax);
 
@@ -127,6 +172,24 @@ public class Levelgenerator : MonoBehaviour
 
         // Platform(en) erzeugen
     }
+
+    void CreatePlatform_Abyss()
+    {
+        // Berechnung welche Platform alles einen Abgrund haben soll (Prozentuale Angabe über public Variable)
+        List<int> lstHasAbyss = GetMyRandomNumbers(0, platformCount, Mathf.RoundToInt(platformAbysPercent * platformCount));
+        // Setzen der Abgrüne
+        if ( lstHasAbyss.Count > 0 )
+        {
+            foreach ( int hasAbyss in lstHasAbyss )
+            {
+                if ( lstPlatforms.Count > hasAbyss )
+                {
+                    Debug.Log("Abgrund auf Platform: " + hasAbyss);
+                    lstPlatforms[hasAbyss].hasAbyss = true;
+                }
+            }
+        }
+    }
     #endregion Functions Platforms
 
     #region Functions Level
@@ -141,6 +204,9 @@ public class Levelgenerator : MonoBehaviour
 
         // Platform(en) erstellen
         CreatePlatform();
+
+        // Abgrüne hinzufügen
+        CreatePlatform_Abyss();
 
         // Elemente auf Platform setzen
 
@@ -165,27 +231,7 @@ public class Levelgenerator : MonoBehaviour
             // Durchlaufe alle Platformen
             foreach ( Platform currPlatform in lstPlatforms )
             {
-                // Durchlaufe alle "Tiles" auf der Platform
-                for ( int i = currPlatform.start; i < currPlatform.end(); i++)
-                {
-                    GameObject currentTile = Tile_Middle;
-                    if ( i == currPlatform.start )
-                    {
-                        currentTile = Tile_Left;
-                    }
-
-                    if ( i == currPlatform.end() - 1)
-                    {
-                        currentTile = Tile_Right;
-                    }
-
-                    float x = i * TileLength;
-                    // Setze aktuelle Position der Platform (Achtung! i gilt dabei als index für "alle" Platformen!!!)
-                    Vector3 pos = new Vector3(x, currPlatform.height, 0);
-                    // Instanzieren eines neuen "Tiles" an der Position
-                    GameObject currTile = (GameObject)Instantiate(currentTile, pos, Quaternion.identity);
-
-                }
+                currPlatform.Build_Platform(this);
             }
         }
     }

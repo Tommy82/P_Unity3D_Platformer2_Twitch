@@ -241,11 +241,12 @@ MonoBehaviour:
   Tile_Middle: {fileID: 4434821478455137497, guid: 6885aa32316adbc4aa0261099f8e3d4d, type: 3}
   Tile_Right: {fileID: 3564415019014219430, guid: 33199715d7405284db7913fa55548903, type: 3}
   TileLength: 1.28
-  platformHeightMin: 0
-  platformHeightMax: 5
+  platformHeightMin: -2
+  platformHeightMax: 3
   platformLengthMin: 3
   platformLengthMax: 5
   platformCount: 10
+  platformAbysPercent: 0.314
 --- !u!4 &1012713052
 Transform:
   m_ObjectHideFlags: 0
