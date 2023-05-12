@@ -37,7 +37,8 @@ public class Levelgenerator : MonoBehaviour
     public float platformAbysPercent = 0.5f;
 
     /// <summary>Liste aller generierten Platformen</summary>
-    private List<Platform> lstPlatforms = new List<Platform>();
+    [HideInInspector]
+    public List<Platform> lstPlatforms = new List<Platform>();
     #endregion Variablen - Spielelemente
 
     // Start is called before the first frame update
@@ -136,6 +137,9 @@ public class Levelgenerator : MonoBehaviour
             // Zufallszahl zwischen 0 und 2 // 0 = Höher / 1 = gleich bleibend / 2 = runter
             int randomHeight = GetMyRandomNumber(0, 2);
 
+            // Speichere vorherige Höhe (nötig damit tiles besser ausgewählt werden können)
+            int heightBefore = currentHeight;
+
             // Setzen der neuen Höhe
             switch ( randomHeight )
             {
@@ -157,6 +161,7 @@ public class Levelgenerator : MonoBehaviour
 
             // Platform erstellen
             Platform currentPlatform = new Platform(
+                _id: i,
                 _start: currentStartIndex,
                 _length: currentLength,
                 _height: currentHeight
@@ -184,7 +189,6 @@ public class Levelgenerator : MonoBehaviour
             {
                 if ( lstPlatforms.Count > hasAbyss )
                 {
-                    Debug.Log("Abgrund auf Platform: " + hasAbyss);
                     lstPlatforms[hasAbyss].hasAbyss = true;
                 }
             }
