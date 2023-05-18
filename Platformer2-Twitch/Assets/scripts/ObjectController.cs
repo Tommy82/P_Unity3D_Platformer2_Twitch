@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ObjectController : MonoBehaviour
 {
@@ -9,7 +10,8 @@ public class ObjectController : MonoBehaviour
     {
         NOTSET,
         Player,
-        Enemy
+        Enemy,
+        Wall,
     }
 
     [Tooltip("Art des Objektes")]
@@ -18,142 +20,78 @@ public class ObjectController : MonoBehaviour
     public float speed = 2.0f;
     [Tooltip("Sprungkraft des Objektes")]
     public float jumpForce = 500.0f;
-    
+    [Tooltip("Spielerschaden bei Berührung")]
+    public float damageOnEnter = 1.0f;
+
+    [Tooltip("Waffe 1")]
+    public GameObject weapon1;
+    [Tooltip("Geschwindigkeit der Waffe")]
+    public float weapon1_speed = 250.0f;
+    [Tooltip("Schaden der Waffe 1")]
+    public float weapon1_damage = 1.0f;
+    [Tooltip("Spawnpoint der Waffe 1")]
+    public Transform weapon1_spawnPoint;
+    [Tooltip("Ist die Waffe 1 eine Wurfwaffe?")]
+    public bool weapon1_throwable;
+    [Tooltip("Angriffsreichweite für Waffe 1")]
+    public float weapon1_range = 100.0f;
+    [Tooltip("Zeit bis nächster Schuss möglich")]
+    public float weapon1_delay = 3;
+    // Aktueller Waffenstatus
+    [HideInInspector]
+    public bool weapon1_active = true;
+    /// <summary>Gibt an ob der Spieler gerade die erste Attacke ausführt</summary>
+    [HideInInspector]
+    public bool isAttacking1 = false;
+
+    [Tooltip("Maximale Leben / Aktuelle Leben")]
+    public float health = 5.0f;
+    [Tooltip("Lebensbalken (Canvas Slider)")]
+    public Slider healthBar;
+    [Tooltip("Leeres Gameobject zum prüfen ob auf Boden")]
     public GameObject groundCheck;
+    [Tooltip("Layer für Wand und Boden")]
     public LayerMask layerGroundOrWall;
 
-    // Rigidbody2D
-    private Rigidbody2D _rb2d;
-    // Animator
-    private Animator _anim;
-    // Schaut der Char gerade nach rechts ?
-    private bool isLookRight = true;
-    // Springt der Char gerade ?
-    private bool isJumping = false;
+    ///<summary>Physik - Rigidbody2D</summary>
+    [HideInInspector]
+    public Rigidbody2D _rb2d;
+    /// <summary>Animator des Charakters</summary>
+    [HideInInspector]
+    public Animator _anim;
+    /// <summary>Gibt an ob der Spieler gerade nach Rechts (true) oder Links (false) schaut</summary>
+    [HideInInspector]
+    public bool isLookRight = true;
+    /// <summary>Gibt an ob der Spieler gerade springt</summary>
+    [HideInInspector]
+    public bool isJumping = false;
+    /// <summary>Gibt an ob der Spieler sich gerade auf dem Boden befindet (true) oder Springt (false)</summary>
     public bool isGrounded = false;
+    /// <summary>Aktuelle Geschwindigkeit des Characters</summary>
     public float currentSpeed = 0;
 
+    public EnemyController enemyController;
+    public PlayerController playerController;
 
     // Start is called before the first frame update
     void Start()
     {
+        // Eigene Components einbinden
         this._rb2d = GetComponent<Rigidbody2D>();
         this._anim = GetComponent<Animator>();
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if ( objectType == ObjectType.Player )
-        {
-            if (Input.GetButtonDown("Jump") && this.isGrounded)
-            {
-                this.isJumping = true;
-            }
-        }
-    }
-
-    private void FixedUpdate()
-    {
+        // Setze Tag
         switch ( this.objectType )
         {
-            case ObjectType.Enemy:
-                FixedUpdate_Enemy();
-                break;
             case ObjectType.Player:
-                FixedUpdate_Player();
+                playerController = gameObject.AddComponent<PlayerController>() as PlayerController;
                 break;
-        }        
-
-        if ( this.groundCheck != null )
-        {
-            this.isGrounded = Physics2D.OverlapCircle(this.groundCheck.transform.position, 0.1f, layerGroundOrWall);
+            case ObjectType.Enemy:
+                enemyController = gameObject.AddComponent<EnemyController>() as EnemyController;
+                break;
+            default:
+                break;
         }
 
-        if ( this._anim )
-        {
-            Debug.Log("Speed: " + currentSpeed);
-            this._anim.SetFloat("Speed", currentSpeed);
-            this._anim.SetBool("isJumping", !isGrounded);
-
-        }
     }
-
-
-    /// <summary>
-    /// Drehe Character
-    /// </summary>
-    void FlipChar()
-    {
-        this.isLookRight = !this.isLookRight;
-        Vector3 myScale = transform.localScale;
-        myScale.x *= -1;
-        transform.localScale = myScale;
-    }
-
-    #region Method - Enemy
-    void FixedUpdate_Enemy()
-    {
-        Enemy_Walk();
-    }
-
-    void Enemy_Walk()
-    {
-        Vector2 position = transform.position;
-        Vector2 direction = Vector2.down;
-        float distance = 0.6f;
-
-        if (this.isLookRight)
-        {
-            position.x += 0.5f;
-            this.speed = Mathf.Abs(this.speed);
-        }
-        else
-        {
-            position.x -= 0.5f;
-            this.speed = Mathf.Abs(this.speed) * -1;
-        }
-
-        RaycastHit2D hit = Physics2D.Raycast(position, direction, distance);
-        //Vector3 directionDebug = transform.TransformDirection(Vector3.down) * distance;
-        //Debug.DrawRay(position, directionDebug, Color.red);
-        if (hit.collider == null)
-        {
-            FlipChar();
-        }
-        this._rb2d.velocity = new Vector2(speed, this._rb2d.velocity.y);
-
-        // Setze aktuelle Geschwindigkeit (z.B. für Animator)
-        this.currentSpeed = Mathf.Abs(this.speed);
-    }
-    #endregion Method - Enemy
-
-    #region Method - Player
-    void FixedUpdate_Player()
-    {
-        // Bewegung (Links / Rechts)
-        float hor = Input.GetAxis("Horizontal");
-        this._rb2d.velocity = new Vector2(hor * this.speed, this._rb2d.velocity.y);
-
-        // Springen
-        if (isJumping)
-        {
-            Debug.Log("Springen: " + this.isJumping.ToString());
-            this._rb2d.AddForce(new Vector2(0, this.jumpForce));
-            this.isJumping = false;
-        }
-
-        // Setze aktuelle Geschwindigkeit (z.B. für Animator)
-        this.currentSpeed = Mathf.Abs(hor);
-
-        // Character bei bedarf drehen
-        if ((hor > 0 && !this.isLookRight)          // Wenn Horizontale Eingabe > 0 UND Spieler schaut nach links ...
-             || (hor < 0 && this.isLookRight)       // Wenn Horizontale Eingabe < 0 UND Spieler schaut nach rechts ...
-            )
-        {
-            FlipChar();
-        }
-    }
-
-    #endregion Method - Player
 }
