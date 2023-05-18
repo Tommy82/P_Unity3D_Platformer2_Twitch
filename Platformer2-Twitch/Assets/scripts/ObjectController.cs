@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class ObjectController : MonoBehaviour
 {
+    /// <summary>
+    /// Art des Objektes
+    /// </summary>
     [HideInInspector]
     public enum ObjectType
     {
@@ -13,6 +16,9 @@ public class ObjectController : MonoBehaviour
         Enemy,
         Wall,
     }
+
+    [Tooltip("Debugmode für dieses GameObject")]
+    public bool isDebugMode = false;
 
     [Tooltip("Art des Objektes")]
     public ObjectType objectType;
@@ -66,32 +72,40 @@ public class ObjectController : MonoBehaviour
     [HideInInspector]
     public bool isJumping = false;
     /// <summary>Gibt an ob der Spieler sich gerade auf dem Boden befindet (true) oder Springt (false)</summary>
+    [HideInInspector]
     public bool isGrounded = false;
     /// <summary>Aktuelle Geschwindigkeit des Characters</summary>
     public float currentSpeed = 0;
-
+    /// <summary>Controller für Gegner</summary>
+    [HideInInspector]
     public EnemyController enemyController;
+    /// <summary>Controller für Player</summary>
+    [HideInInspector]
     public PlayerController playerController;
 
     // Start is called before the first frame update
     void Start()
     {
-        // Eigene Components einbinden
-        this._rb2d = GetComponent<Rigidbody2D>();
-        this._anim = GetComponent<Animator>();
+        #region Eigene Components einbinden
+        this._rb2d = GetComponent<Rigidbody2D>();   // Physik - Rigidbody2D (muss dem Char über Inspektor zugewiesen sein!)
+        this._anim = GetComponent<Animator>();      // Animator (muss dem Char über Inspektor zugewiesen sein!)
+        #endregion
 
-        // Setze Tag
+        #region Laden der Individuellen Controller
         switch ( this.objectType )
         {
+            // Lade PlayerController
             case ObjectType.Player:
                 playerController = gameObject.AddComponent<PlayerController>() as PlayerController;
                 break;
+            // Lade EnemyController
             case ObjectType.Enemy:
                 enemyController = gameObject.AddComponent<EnemyController>() as EnemyController;
                 break;
             default:
                 break;
         }
+        #endregion
 
     }
 }

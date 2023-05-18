@@ -4,24 +4,36 @@ using UnityEngine;
 
 public class HealthController : MonoBehaviour
 {
+    /// <summary>Variablen, welche dem aktuellem GameObject zugewiesen sind</summary>
     protected ObjectController objC;
 
-    // Start is called before the first frame update
-    void Start()
+    /// <summary>
+    /// Wird nur einmal beim Start bzw. beim Instanzieren des GameObjects ausgeführt
+    /// Achtung! Bei Abhängigkeiten MUSS "base.Start()" ausgeführt werden!
+    /// </summary>
+    protected void Start()
     {
-        this.objC = gameObject.GetComponent<ObjectController>();
+        #region Laden der benötigten Controller
+        this.objC = gameObject.GetComponent<ObjectController>();                            // Variablen welche über den inspektor zugewiesen sind
+        #endregion
 
-        // Setzen der HealthBar
-        if (this.objC.healthBar)
-        {
-            this.objC.healthBar.maxValue = this.objC.health;
-            this.objC.healthBar.value = this.objC.health;
+        #region Setzen der Standardparamter für Health Bar
+        if (this.objC.healthBar)                                // Wenn Healthbar vorhanden ist ...
+        {       
+            this.objC.healthBar.maxValue = this.objC.health;    // ... setze maximales Leben
+            this.objC.healthBar.value = this.objC.health;       // ... setze aktuelles Leben
         }
+        #endregion Setzen der Standardparameter für HealthBar
     }
 
+    /// <summary>
+    /// Funktion wird zu einer bestimmten Zeit ausgeführt
+    /// (ProjectSettings->Time->FixedTimeStep)
+    /// Achtung! Bei Abhängigkeiten MUSS "base.FixedUpdate" ausgeführt werden!
+    /// </summary>
     private void FixedUpdate()
     {
-        this.CheckHealth();
+        this.CheckHealth();     // Prüfe aktuelle Gesundheit und Healthbar
     }
 
     /// <summary>
@@ -29,29 +41,28 @@ public class HealthController : MonoBehaviour
     /// </summary>
     void CheckHealth()
     {
-        if (this.objC.healthBar)
+        if (this.objC.healthBar)                            // Wenn Healthbar vorhandne ist ...
         {
-            this.objC.healthBar.value = this.objC.health;
+            this.objC.healthBar.value = this.objC.health;   // Setze aktuellen Status mit aktuellem Leben aus ObjectController
         }
 
-        if (this.objC.health <= 0)
+        if (this.objC.health <= 0)                          // Wenn aktuelles Leben <= 0 ...
         {
-            Die();
+            Die();                                          // ... führe Sterbefunktion aus
         }
     }
 
     /// <summary>
-    /// Stirb!
+    /// Sterbefunktion
     /// </summary>
     void Die()
     {
-        // Starte "Dying" Animation
-        // Timer solange Dying animation läuft
+        // ToDo: Starte "Dying" Animation
+        // ToDo: Timer solange Dying animation läuft
 
-        // Wenn nicht Player, zerstöre aktuelles Gameobject
-        if (objC.objectType != ObjectController.ObjectType.Player)
+        if (objC.objectType != ObjectController.ObjectType.Player)      // Wenn nicht Player ...
         {
-            Destroy(gameObject);
+            Destroy(gameObject);                                        // ... zerstöre aktuelles Gameobject
         }
     }
 }
