@@ -22,6 +22,8 @@ public class ObjectController : MonoBehaviour
 
     [Tooltip("Art des Objektes")]
     public ObjectType objectType;
+    [Tooltip("Unverwundbar in Sek. bei Treffer")]
+    public float invulnerableOnHit = 3.0f;
     [Tooltip("Geschwindigkeit des Objektes")]
     public float speed = 2.0f;
     [Tooltip("Sprungkraft des Objektes")]
@@ -106,6 +108,49 @@ public class ObjectController : MonoBehaviour
                 break;
         }
         #endregion
+    }
+
+    private void Update()
+    {
+        if ( isBlinking )
+        {
+            Blink();
+        }
+    }
+
+    #region Blinking 
+    public bool isBlinking = false;     // Soll blinken ?
+    public float blinkTotal = 0.0f;     // Wie lange schon am Blinken
+    public float blinkTimer = 0.0f;     // Aktuell an oder aus Timer
+    public float blinkTimerDuration = 0.1f;     // BlinkInterval
+
+
+    private void Blink()
+    {
+        blinkTimer += Time.deltaTime;
+        if ( blinkTimer >= blinkTimerDuration)
+        {
+            blinkTimer = 0;
+            if ( gameObject.GetComponent<SpriteRenderer>().enabled == true )
+            {
+                gameObject.GetComponent<SpriteRenderer>().enabled = false;
+            } else
+            {
+                gameObject.GetComponent<SpriteRenderer>().enabled = true;
+            }
+        }
+
+        blinkTotal += Time.deltaTime;
+        if (blinkTotal >= this.invulnerableOnHit)
+        {
+            isBlinking = false;
+            blinkTotal = 0;
+
+            gameObject.GetComponent<SpriteRenderer>().enabled = true;
+
+            return;
+        }
 
     }
+    #endregion Blinking
 }

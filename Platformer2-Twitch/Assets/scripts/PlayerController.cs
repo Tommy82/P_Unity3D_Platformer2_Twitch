@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class PlayerController : CharacterController
 {
+
+    List<Collider2D> lstCollidersIgnore = new List<Collider2D>();
+    bool isBlinking = true;
+
     /// <summary>
     /// Wird nur einmal beim Start bzw. beim Instanzieren des GameObjects ausgeführt
     /// Achtung! Bei Abhängigkeiten MUSS "base.Start()" ausgeführt werden!
@@ -72,4 +76,51 @@ public class PlayerController : CharacterController
         #endregion Springen
 
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if ( collision.gameObject.tag == "enemy")
+        {
+            Collider2D[] enemyColliders = collision.gameObject.GetComponents<Collider2D>();
+            Collider2D[] playerColliders = gameObject.GetComponents<Collider2D>();
+
+            for ( var i = 0; i < playerColliders.Length; i++ )
+            {
+                Collider2D col1 = playerColliders[i];
+                for ( var j = 0; j < enemyColliders.Length; j++ )
+                {
+                    Collider2D col2 = enemyColliders[j];
+
+                    Physics2D.IgnoreCollision(col1, col2, true);
+                    lstCollidersIgnore.Add(col2);
+                }
+            }
+            Invoke("DisableCollisionEnter2D", objC.invulnerableOnHit);
+
+            ObjectController enemyObjController = collision.gameObject.GetComponent<ObjectController>();
+            if (enemyObjController)
+            {
+                objC.isBlinking = true;
+                objC.health -= enemyObjController.damageOnEnter;
+            }
+
+        }
+    }
+
+    private void DisableCollisionEnter2D()
+    {
+        Collider2D[] playerColliders = gameObject.GetComponents<Collider2D>();
+        for (var i = 0; i < playerColliders.Length; i++)
+        {
+            Collider2D col1 = playerColliders[i];
+            for (var j = 0; j < lstCollidersIgnore.Count; j++)
+            {
+                Collider2D col2 = lstCollidersIgnore[j];
+
+                Physics2D.IgnoreCollision(col1, col2, false);
+            }
+        }
+        lstCollidersIgnore.Clear();
+    }
+
 }

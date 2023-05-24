@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4829918252712351543}
   m_Layer: 0
   m_Name: ZombieMale
-  m_TagString: Untagged
+  m_TagString: enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -324,25 +324,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c60e4e041f2f1a4da8557e0d4961558, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDebugMode: 0
   objectType: 2
   speed: 2
   jumpForce: 500
   damageOnEnter: 1
   weapon1: {fileID: 0}
-  weapon1_speed: 50
-  weapon1_damage: 1
+  weapon1_speed: 0
+  weapon1_damage: 0
   weapon1_spawnPoint: {fileID: 0}
   weapon1_throwable: 0
-  weapon1_range: 100
-  weapon1_delay: 3
+  weapon1_range: 0
+  weapon1_delay: 0
+  weapon1_active: 1
+  isAttacking1: 0
   health: 5
   healthBar: {fileID: 4829918253013828152}
   groundCheck: {fileID: 0}
   layerGroundOrWall:
     serializedVersion: 2
     m_Bits: 0
+  _rb2d: {fileID: 0}
+  _anim: {fileID: 0}
+  isLookRight: 1
+  isJumping: 0
   isGrounded: 0
   currentSpeed: 0
+  enemyController: {fileID: 0}
+  playerController: {fileID: 0}
 --- !u!1 &4829918253013828154
 GameObject:
   m_ObjectHideFlags: 0

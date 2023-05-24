@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class HealthController : MonoBehaviour
 {
@@ -62,7 +63,13 @@ public class HealthController : MonoBehaviour
 
         if (objC.objectType != ObjectController.ObjectType.Player)      // Wenn nicht Player ...
         {
+            // Wenn nicht Spieler 
             Destroy(gameObject);                                        // ... zerstöre aktuelles Gameobject
+        } else
+        {
+            // Wenn Spieler
+            Scene current = SceneManager.GetActiveScene();  // Lade aktuelle Scene
+            SceneManager.LoadScene(current.name);           // Starte Level neu / ToDo: Automatische Levelgenerierung (seed) hinzufügen!
         }
     }
 }
