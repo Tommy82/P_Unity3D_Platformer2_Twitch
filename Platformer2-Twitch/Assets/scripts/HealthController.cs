@@ -58,18 +58,31 @@ public class HealthController : MonoBehaviour
     /// </summary>
     void Die()
     {
-        // ToDo: Starte "Dying" Animation
-        // ToDo: Timer solange Dying animation läuft
+
+        objC._anim.SetBool("isDying", true);    // Setze Animation
+        objC.speed = 0;                         // Setze aktuelle Geschwindigkeit auf 0
+        objC.healthBar.enabled = false;         // Deaktiviere Healthbar
 
         if (objC.objectType != ObjectController.ObjectType.Player)      // Wenn nicht Player ...
         {
-            // Wenn nicht Spieler 
-            Destroy(gameObject);                                        // ... zerstöre aktuelles Gameobject
+            // Wenn nicht Spieler
+            objC.DestroyObject(objC.destroyAfterTime, false);
         } else
         {
             // Wenn Spieler
-            Scene current = SceneManager.GetActiveScene();  // Lade aktuelle Scene
-            SceneManager.LoadScene(current.name);           // Starte Level neu / ToDo: Automatische Levelgenerierung (seed) hinzufügen!
+            Invoke("ReloadLevel", objC.destroyAfterTime);
         }
     }
+
+    void ReloadLevel()
+    {
+        // Reset Animation
+        objC._anim.SetBool("isDying", false);
+
+        // Reload Level / ToDo: Seed aus automatischer Levelgenerierung berücksichtigen
+        Scene current = SceneManager.GetActiveScene();  // Lade aktuelle Scene
+        SceneManager.LoadScene(current.name);           // Starte Level neu / ToDo: Automatische Levelgenerierung (seed) hinzufügen!
+    }
 }
+
+

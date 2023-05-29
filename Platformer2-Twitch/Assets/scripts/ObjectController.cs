@@ -17,73 +17,80 @@ public class ObjectController : MonoBehaviour
         Wall,
     }
 
+    [Header("Globale Objekteinstellungen")]
     [Tooltip("Debugmode für dieses GameObject")]
     public bool isDebugMode = false;
-
     [Tooltip("Art des Objektes")]
     public ObjectType objectType;
-    [Tooltip("Unverwundbar in Sek. bei Treffer")]
-    public float invulnerableOnHit = 3.0f;
-    [Tooltip("Geschwindigkeit des Objektes")]
-    public float speed = 2.0f;
-    [Tooltip("Sprungkraft des Objektes")]
-    public float jumpForce = 500.0f;
-    [Tooltip("Spielerschaden bei Berührung")]
-    public float damageOnEnter = 1.0f;
-
-    [Tooltip("Waffe 1")]
-    public GameObject weapon1;
-    [Tooltip("Geschwindigkeit der Waffe")]
-    public float weapon1_speed = 250.0f;
-    [Tooltip("Schaden der Waffe 1")]
-    public float weapon1_damage = 1.0f;
-    [Tooltip("Spawnpoint der Waffe 1")]
-    public Transform weapon1_spawnPoint;
-    [Tooltip("Ist die Waffe 1 eine Wurfwaffe?")]
-    public bool weapon1_throwable;
-    [Tooltip("Angriffsreichweite für Waffe 1")]
-    public float weapon1_range = 100.0f;
-    [Tooltip("Zeit bis nächster Schuss möglich")]
-    public float weapon1_delay = 3;
-    // Aktueller Waffenstatus
-    [HideInInspector]
-    public bool weapon1_active = true;
-    /// <summary>Gibt an ob der Spieler gerade die erste Attacke ausführt</summary>
-    [HideInInspector]
-    public bool isAttacking1 = false;
-
-    [Tooltip("Maximale Leben / Aktuelle Leben")]
-    public float health = 5.0f;
-    [Tooltip("Lebensbalken (Canvas Slider)")]
-    public Slider healthBar;
+    [HideInInspector, Tooltip("Physik - Rigidbody2D - Wird automatisch zugewiesen, Component muss dem Objekt zugewiesen sein!")]
+    public Rigidbody2D _rb2d;
+    [HideInInspector, Tooltip("Animator des Charakters - Wird automatisch zugewiesen, Component muss dem Objekt zugewiesen sein!")]
+    public Animator _anim;
     [Tooltip("Leeres Gameobject zum prüfen ob auf Boden")]
     public GameObject groundCheck;
     [Tooltip("Layer für Wand und Boden")]
     public LayerMask layerGroundOrWall;
-
-    ///<summary>Physik - Rigidbody2D</summary>
-    [HideInInspector]
-    public Rigidbody2D _rb2d;
-    /// <summary>Animator des Charakters</summary>
-    [HideInInspector]
-    public Animator _anim;
-    /// <summary>Gibt an ob der Spieler gerade nach Rechts (true) oder Links (false) schaut</summary>
-    [HideInInspector]
-    public bool isLookRight = true;
-    /// <summary>Gibt an ob der Spieler gerade springt</summary>
-    [HideInInspector]
-    public bool isJumping = false;
-    /// <summary>Gibt an ob der Spieler sich gerade auf dem Boden befindet (true) oder Springt (false)</summary>
-    [HideInInspector]
-    public bool isGrounded = false;
-    /// <summary>Aktuelle Geschwindigkeit des Characters</summary>
-    public float currentSpeed = 0;
-    /// <summary>Controller für Gegner</summary>
-    [HideInInspector]
+    [HideInInspector, Tooltip("Controller für Gegner")]
     public EnemyController enemyController;
-    /// <summary>Controller für Player</summary>
-    [HideInInspector]
+    [HideInInspector, Tooltip("Controller für Player")]
     public PlayerController playerController;
+
+    [Header("Bewegung")]
+    [Tooltip("Geschwindigkeit des Objektes")]
+    public float speed = 2.0f;
+    [Tooltip("Sprungkraft des Objektes")]
+    public float jumpForce = 500.0f;
+    [HideInInspector, Tooltip("Gibt an ob der Spieler gerade nach Rechts (true) oder Links (false) schaut")]
+    public bool isLookRight = true;
+    [HideInInspector, Tooltip("Gibt an ob der Spieler gerade springt")]
+    public bool isJumping = false;
+    [HideInInspector, Tooltip("Gibt an ob der Spieler sich gerade auf dem Boden befindet (true) oder Springt (false)")]
+    public bool isGrounded = false;
+    [HideInInspector, Tooltip("Aktuelle Geschwindigkeit des Characters")]
+    public float currentSpeed = 0;
+
+    [Header("Angriff - Allgemein")]
+    [Tooltip("Objekt kann angreifen")]
+    public bool canAttack = true;
+
+    [Header("Angriff - Waffe 1")]
+    [Tooltip("Waffe 1")]
+    public GameObject weapon1;
+    [Tooltip("Geschwindigkeit der Waffe")]
+    public float weapon1Speed = 250.0f;
+    [Tooltip("Schaden der Waffe 1")]
+    public float weapon1Damage = 1.0f;
+    [Tooltip("Spawnpoint der Waffe 1")]
+    public Transform weapon1SpawnPoint;
+    [Tooltip("Ist die Waffe 1 eine Wurfwaffe?")]
+    public bool weapon1Throwable;
+    [Tooltip("Angriffsreichweite für Waffe 1")]
+    public float weapon1Range = 100.0f;
+    [Tooltip("Zeit bis nächster Schuss möglich")]
+    public float weapon1Delay = 3;
+    [HideInInspector, Tooltip("Aktueller Waffenstatus")]
+    public bool weapon1Active = true;
+    [HideInInspector, Tooltip("Gibt an ob der Spieler gerade die erste Attacke ausführt")]
+    public bool isAttacking1 = false;
+    [Tooltip("Aktuelle Anzahl dieser Waffe (-1 = unendlich)")]
+    public int weapon1Count = -1;
+
+    [Header("Gesundheit / Schaden")]
+    [Tooltip("Unverwundbar in Sek. bei Treffer")]
+    public float invulnerableOnHit = 3.0f;
+    [Tooltip("nach welcher Zeit soll das Objekt zerstört werden? (Dauer der Sterbeanimation)")]
+    public float destroyAfterTime = 0.0f;
+    [Tooltip("Spielerschaden bei Berührung")]
+    public float damageOnEnter = 1.0f;
+    [Tooltip("Maximale Leben / Aktuelle Leben")]
+    public float health = 5.0f;
+    [Tooltip("Lebensbalken (Canvas Slider)")]
+    public Slider healthBar;
+    [HideInInspector, Tooltip("Gibt an ob das Objekt blinken soll")]
+    public bool isBlinking = false;
+    [Tooltip("Wie lange soll das Objekt bei einem Treffer blinken?")]
+    public float blinkInterval = 0.1f;
+
 
     // Start is called before the first frame update
     void Start()
@@ -119,38 +126,73 @@ public class ObjectController : MonoBehaviour
     }
 
     #region Blinking 
-    public bool isBlinking = false;     // Soll blinken ?
-    public float blinkTotal = 0.0f;     // Wie lange schon am Blinken
-    public float blinkTimer = 0.0f;     // Aktuell an oder aus Timer
-    public float blinkTimerDuration = 0.1f;     // BlinkInterval
+    /// <summary>Gibt an wie lange das Objekt schon blinkt</summary>
+    private float blinkTotal = 0.0f;     // Wie lange schon am Blinken
+    /// <summary>Timer wie lange das Sprite aktiviert oder deaktiviert sein soll</summary>
+    private float blinkTimer = 0.0f;
 
-
+    /// <summary>
+    /// Start des Blinkens
+    /// </summary>
     private void Blink()
     {
-        blinkTimer += Time.deltaTime;
-        if ( blinkTimer >= blinkTimerDuration)
+        blinkTimer += Time.deltaTime;                                           // Füge aktuelle Zeit dem Blinktimer hinzu
+        if ( blinkTimer >= blinkInterval)                                  // Wenn BlinkTimer > Blinkdauer ...
         {
-            blinkTimer = 0;
-            if ( gameObject.GetComponent<SpriteRenderer>().enabled == true )
+            blinkTimer = 0;                                                     // ... Setze blinkTimer auf 0
+            if ( gameObject.GetComponent<SpriteRenderer>().enabled == true )    // ... Wenn aktueller Sprite an ist ...
             {
-                gameObject.GetComponent<SpriteRenderer>().enabled = false;
-            } else
+                gameObject.GetComponent<SpriteRenderer>().enabled = false;      // ... ... deaktiviere Sprite
+            }
+            else                                                                // ... sonst ...
             {
-                gameObject.GetComponent<SpriteRenderer>().enabled = true;
+                gameObject.GetComponent<SpriteRenderer>().enabled = true;       // ... ... aktiviere Sprite
             }
         }
 
-        blinkTotal += Time.deltaTime;
-        if (blinkTotal >= this.invulnerableOnHit)
+        blinkTotal += Time.deltaTime;                                           // Füge aktuelle Zeit der totalen Blinkzeit hinzu
+        if (blinkTotal >= this.invulnerableOnHit)                               // Wenn totale Blinkzeit > gewünschte Blinkdauer
         {
-            isBlinking = false;
-            blinkTotal = 0;
+            isBlinking = false;                                                 // Deaktiviere Blinken
+            blinkTotal = 0;                                                     // Setze totale Blinkdauer zurück auf 0
 
-            gameObject.GetComponent<SpriteRenderer>().enabled = true;
-
-            return;
+            gameObject.GetComponent<SpriteRenderer>().enabled = true;           // Aktiviere Sprite (falls es zu dem zeitpunkt deaktiviert war)
         }
 
     }
     #endregion Blinking
+
+    #region DestroyObject
+    /// <summary>
+    /// Lässt das Objekt nach einer gewissen Zeit sterben
+    /// </summary>
+    /// <param name="delay"></param>
+    public void DestroyObject(float delay = 0, bool setBlink = false)
+    {
+        if ( setBlink )
+        {
+            this.isBlinking = true;
+            this.invulnerableOnHit = delay; // Benötigt damit das Objekt lange genug blinkt
+        }
+
+
+        if ( delay > 0 )                        // Wenn Delay angegeben ...
+        {
+            Debug.Log("Delay: " + delay + " Sek");
+            Invoke("_DestroyObject", delay);    // ... zerstöre Objekt nach der Zeit
+        } else
+        {
+            Debug.Log("No Delay");
+            _DestroyObject();                   // ... sonst zerstöre Objekt sofort
+        }
+    }
+
+    /// <summary>
+    /// Zerstöre Objekt
+    /// </summary>
+    private void _DestroyObject()
+    {
+        Destroy(this.gameObject);
+    }
+    #endregion DestroyObject
 }

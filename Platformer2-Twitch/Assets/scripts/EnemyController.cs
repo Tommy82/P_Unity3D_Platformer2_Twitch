@@ -35,28 +35,35 @@ public class EnemyController : CharacterController
         // Prüfen ob aktueller ObejctType ein "Gegner" ist
         if ( this.objC.objectType == ObjectController.ObjectType.Enemy ) { 
             // Prüfen ob Waffen vorhanden sind
-            if (this.objC.weapon1_active && this.objC.weapon1 && this.objC.weapon1_spawnPoint)
+            if (this.objC.weapon1Active && this.objC.weapon1 && this.objC.weapon1SpawnPoint) // ToDo: Überarbeiten wenn keine Throwable Waffe vorhanden ist ...
             {
                 // Erzeuge ein Raycast (Linie welche auf andere Collider reagiert)
-                RaycastHit2D hit = Physics2D.Raycast(this.objC.weapon1_spawnPoint.transform.position, (this.objC.isLookRight ? Vector2.right : Vector2.left), this.objC.weapon1_range);
+                RaycastHit2D hit = Physics2D.Raycast(this.objC.weapon1SpawnPoint.transform.position, (this.objC.isLookRight ? Vector2.right : Vector2.left), this.objC.weapon1Range);
                 // Wenn Raycast (Linie) einen anderen Collider getroffen hat UND andere Collider ein Player ist UND Attacke1 erlaubt ist ...
                 if (hit.collider != null && hit.collider.tag == "Player" && this.objC.isAttacking1 == false)
                 {
                     // Setze Attacke1 (wird im AttackController:FixedUpdate ausgeführt)
                     this.objC.isAttacking1 = true;
                     // Setze aktuelle Waffe als NICHT aktiv
-                    this.objC.weapon1_active = false;
+                    this.objC.weapon1Active = false;
                     // Warte bis Waffe wieder verfügbar
-                    Invoke("Weapon1SetActive", this.objC.weapon1_delay);
+                    Invoke("Weapon1SetActive", this.objC.weapon1Delay);
                 }
 
                 // DebugMode
                 if (this.objC.isDebugMode)
                 {
-                    Vector3 directionDebug = transform.TransformDirection(this.objC.isLookRight ? Vector2.right : Vector2.left) * this.objC.weapon1_range;
-                    Debug.DrawRay(this.objC.weapon1_spawnPoint.transform.position, directionDebug, Color.red);
+                    Vector3 directionDebug = transform.TransformDirection(this.objC.isLookRight ? Vector2.right : Vector2.left) * this.objC.weapon1Range;
+                    Debug.DrawRay(this.objC.weapon1SpawnPoint.transform.position, directionDebug, Color.red);
                 }
 
+            }
+            else
+            {
+                if ( this.objC.weapon1Throwable == false )
+                {
+
+                }
             }
         }
     }
@@ -66,7 +73,7 @@ public class EnemyController : CharacterController
     /// </summary>
     void Weapon1SetActive()
     {
-        this.objC.weapon1_active = true;
+        this.objC.weapon1Active = true;
     }
 
     /// <summary>

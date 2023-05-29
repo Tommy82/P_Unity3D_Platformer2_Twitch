@@ -6,7 +6,6 @@ public class PlayerController : CharacterController
 {
 
     List<Collider2D> lstCollidersIgnore = new List<Collider2D>();
-    bool isBlinking = true;
 
     /// <summary>
     /// Wird nur einmal beim Start bzw. beim Instanzieren des GameObjects ausgeführt

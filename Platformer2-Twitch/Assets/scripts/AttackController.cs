@@ -25,7 +25,7 @@ public class AttackController : MonoBehaviour
     /// </summary>
     private void FixedUpdate()
     {
-        if (this.objC.isAttacking1)             // Wenn Variable für Anfriff1 gesetzt ...
+        if (this.objC.canAttack && this.objC.isAttacking1)             // Wenn Variable für Anfriff1 gesetzt ...
         {
             Attack1();                          // ... führe Angriff1 aus
             this.objC.isAttacking1 = false;     // ... Setze Variable für Angriff zurück
@@ -39,18 +39,20 @@ public class AttackController : MonoBehaviour
     /// </summary>
     void Attack1()
     {
+        if (objC.isDebugMode) { Debug.Log("Start Attack 1"); }
+
         // Wenn Waffe vorhanden UND Waffe eine Wurfwaffe (Fernwaffe) ...
-        if (this.objC.weapon1 && this.objC.weapon1_throwable)
+        if (this.objC.weapon1 && this.objC.weapon1Throwable)
         {
             // ... Instanzieren der Waffe im Spiel
-            GameObject myWeapon = (GameObject)Instantiate(this.objC.weapon1, this.objC.weapon1_spawnPoint.position, Quaternion.identity);
+            GameObject myWeapon = (GameObject)Instantiate(this.objC.weapon1, this.objC.weapon1SpawnPoint.position, Quaternion.identity);
             
             if (myWeapon)   // Wenn Waffe vorhanden und instanziert ....
             {
                 Weapon myWeaponScript = myWeapon.GetComponent<Weapon>();    // ... Lade Waffenscript von Waffe
                 if (myWeaponScript)                                         // ... Wenn Waffenscript vorhanden ...
                 {
-                    myWeaponScript.damage = objC.weapon1_damage;            // ... ... setze Schaden der Waffe
+                    myWeaponScript.damage = objC.weapon1Damage;            // ... ... setze Schaden der Waffe
                     switch (objC.objectType)
                     {
                         case ObjectController.ObjectType.Enemy:             // ... ... Wenn aktueller Type ein Gegner ...
@@ -70,16 +72,18 @@ public class AttackController : MonoBehaviour
                 var myScale = myWeapon.transform.localScale;            // ... lade aktuelle Scale des GameObjects
                 if (this.objC.isLookRight)                              // ... Wenn Char nach rechts schaut ....
                 {
-                    myWeapon.GetComponent<Rigidbody2D>().AddForce(Vector3.right * this.objC.weapon1_speed); // ... ... setze eine Physikalische Kraft auf Waffe nach Rechts
+                    myWeapon.GetComponent<Rigidbody2D>().AddForce(Vector3.right * this.objC.weapon1Speed); // ... ... setze eine Physikalische Kraft auf Waffe nach Rechts
                 }
                 if (!this.objC.isLookRight)                             // ... Wenn Char nach Links schaut ...
                 {
-                    myWeapon.GetComponent<Rigidbody2D>().AddForce(Vector3.left * this.objC.weapon1_speed);  // ... ... setze eine Physikalische Kraft auf Waffe nach Links
+                    myWeapon.GetComponent<Rigidbody2D>().AddForce(Vector3.left * this.objC.weapon1Speed);  // ... ... setze eine Physikalische Kraft auf Waffe nach Links
                     myScale.x = myScale.x * -1;                         // Setze X Richtung der Waffe (Achtung! Waffe MUSS standardmäßig nach rechts ausgerichtet sein!!!)
                 }
                 myWeapon.transform.localScale = myScale;                // ... Setze Richtung (Scale) der Waffe
                 #endregion
             }
         }
+
+        // ToDo: Keine Wurfwaffe (z.B. Schwert) einbauen
     }
 }
